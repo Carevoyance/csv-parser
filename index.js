@@ -69,12 +69,17 @@ class CsvParser extends Transform {
     const Row = genfun()('function Row (cells) {')
 
     if (this.headers) {
-      this.headers.forEach((header, index) => {
-        const newHeader = this.mapHeaders({ header, index })
-        if (newHeader) {
-          Row('%s = cells[%d]', genobj('this', newHeader), index)
-        }
-      })
+      try {
+        this.headers.forEach((header, index) => {
+          const newHeader = this.mapHeaders({ header, index })
+          if (newHeader) {
+            Row('%s = cells[%d]', genobj('this', newHeader), index)
+          }
+        })
+      } catch(e) {
+        this.emit('error', e);
+        return;
+      }
     } else {
       // -> false
       Row(`
